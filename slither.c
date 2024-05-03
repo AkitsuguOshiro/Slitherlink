@@ -174,7 +174,7 @@ int main () {
     {
        for (int j = 1; j < column + 1; j++)
        {
-            if (status[i][j].number == 3)//ここから3の処理
+            if (status[i][j].number == 3)//ここから3の処理xが確定している場合
             {
                 int thisgroup = status[i][j].group;
                 if (status[i - 1][j].group == thisgroup)
