@@ -159,7 +159,7 @@ int countaroundgroup( int thisgroup,int i, int j, int sa)
     return numbers;
 }
 
-void process()
+void processbyaroundgroup()
 {
     for (int i = 1; i < grow - 1; i++)
     {
@@ -179,6 +179,49 @@ void process()
             
         }
     }
+}
+
+void processbycornorgroup()
+{
+    int plusminus[4][2] = {{-1,-1},{1,-1},{-1,1},{1,1}};
+    for (int i = 1; i < grow - 1; i++)
+    {
+       for (int j = 1; j < gcolumn - 1; j++)
+       {
+            if(status[i][j].number == 1)
+            {
+                int thisgroup = status[i][j].group;
+                for (int k = 0; k < 4; k++)
+                {
+                    int type = judgeconortype(i, j, k);
+                    if( type != 0)
+                    {
+                        
+                    }
+                }
+                
+            }
+       }
+    }
+}
+
+int judgeconortype(int i, int j, int k)//kが4方向に対応。戻り値0の場合はどれでもない
+{
+    int plusminus[4][2] = {{-1,-1},{1,-1},{-1,1},{1,1}};
+    if(status[i + plusminus[k][0]][j].group == status[i + plusminus[k][0]][j + plusminus[k][1]].group && status[i + plusminus[k][0]][j + plusminus[k][1]].group == status[i][j + plusminus[k][1]].group)
+    {
+        return 1;
+    }else if (status[i + plusminus[k][0]][j].group == status[i + plusminus[k][0]][j + plusminus[k][1]].group && status[i + plusminus[k][0]][j + plusminus[k][1]].group == -status[i][j + plusminus[k][1]].group)
+    {
+        return 2;
+    }else if(status[i + plusminus[k][0]][j].group == -status[i + plusminus[k][0]][j + plusminus[k][1]].group && status[i + plusminus[k][0]][j + plusminus[k][1]].group == status[i][j + plusminus[k][1]].group)
+    {
+        return 3;
+    }else if(status[i + plusminus[k][0]][j].group == -status[i + plusminus[k][0]][j + plusminus[k][1]].group && status[i + plusminus[k][0]][j + plusminus[k][1]].group == -status[i][j + plusminus[k][1]].group)
+    {
+        return 4;
+    }else return 0;
+    
 }
 
 void preresult()
@@ -216,7 +259,7 @@ int main ()
     process0();
     for (int i = 0; i < 10; i++)
     {
-        process();
+        processbyaroundgroup();
     }
     
     debughere();
