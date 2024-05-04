@@ -113,7 +113,7 @@ void process0()
 void changegroup(int a, int b, int sa)//二つのグループの関係が確定した時に用いるchangegroup(group1, group2, 同じか-1倍か)
 {
     int small, large;
-    if(abs(a) == abs(b)) return;
+    if(abs(a) == abs(b)) return;//これここじゃなくchangegroupを呼び出す前で判断したほうがいい気がする
     if (abs(a) < abs(b))
     {
         small = a;
@@ -131,18 +131,30 @@ void changegroup(int a, int b, int sa)//二つのグループの関係が確定�
             if (status[i][j].group == large)
             {
                 status[i][j].group = small*sa;
-            }   
+
+            }else if(status[i][j].group == -large)
+            {
+                status[i][j].group == -small*sa;
+            }
         }   
     }
 }
 
-int countsamegroup(int i, int j, int thisgroup)
+void changefixedgroup(int thisgroup, int i, int j, int sa)
+{
+    changegroup(thisgroup, status[i - 1][j].group, sa);
+    changegroup(thisgroup, status[i][j - 1].group, sa);
+    changegroup(thisgroup, status[i][j + 1].group, sa);
+    changegroup(thisgroup, status[i + 1][j].group, sa);
+}
+
+int countaroundgroup( int thisgroup,int i, int j, int sa)
 {
     int numbers = 0;
-    if(thisgroup == status[i - 1][j].group) numbers++;
-    if(thisgroup == status[i][j - 1].group) numbers++;
-    if(thisgroup == status[i][j + 1].group) numbers++;
-    if(thisgroup == status[i + 1][j].group) numbers++;
+    if(thisgroup == sa*status[i - 1][j].group) numbers++;
+    if(thisgroup == sa*status[i][j - 1].group) numbers++;
+    if(thisgroup == sa*status[i][j + 1].group) numbers++;
+    if(thisgroup == sa*status[i + 1][j].group) numbers++;
 
     return numbers;
 }
@@ -153,37 +165,16 @@ void process()
     {
        for (int j = 1; j < gcolumn - 1; j++)
        {
-            if (status[i][j].number == 3)//ここから3の処理xが確定している場合
+            if(status[i][j].number == 1 || status[i][j].number == 2 || status[i][j].number == 3)
             {
                 int thisgroup = status[i][j].group;
-                if(countsamegroup(i, j, thisgroup) == 1)
+                if(countaroundgroup(thisgroup, i, j, 1) == 4 - status[i][j].number) 
                 {
-                    if (status[i - 1][j].group == thisgroup)
+                    changefixedgroup(thisgroup, i, j, -1);
+                } else if (countaroundgroup(thisgroup, i, j, -1) == status[i][j].number)
                 {
-                    changegroup(thisgroup, status[i][j - 1].group, -1);
-                    changegroup(thisgroup, status[i][j + 1].group, -1);
-                    changegroup(thisgroup, status[i + 1][j].group, -1);
-                }else if (status[i][j - 1].group == thisgroup)
-                {
-                    changegroup(thisgroup, status[i - 1][j].group, -1);
-                    changegroup(thisgroup, status[i][j + 1].group, -1);
-                    changegroup(thisgroup, status[i + 1][j].group, -1);
-                }else if (status[i][j + 1].group == thisgroup)
-                {
-                    changegroup(thisgroup, status[i - 1][j].group, -1);
-                    changegroup(thisgroup, status[i][j - 1].group, -1);
-                    changegroup(thisgroup, status[i + 1][j].group, -1);
-                }else if (status[i + 1][j].group == thisgroup)
-                {
-                    changegroup(thisgroup, status[i - 1][j].group, -1);
-                    changegroup(thisgroup, status[i][j - 1].group, -1);
-                    changegroup(thisgroup, status[i][j + 1].group, -1);
+                    changefixedgroup(thisgroup, i, j, 1);
                 }
-                }     
-            } else if (status[i][j].number == 2)
-            {
-                int thisgroup = status[i][j].group;
-
             }
             
         }
@@ -223,7 +214,11 @@ int main ()
     if(setup() == 1) return 0;//構造体に情報を入れる
     //基本戦略として、あるマスの周りにある数字のうち一番絶対値が小さいものに関して同じグループかどうかを判定する。
     process0();
-    process();
+    for (int i = 0; i < 10; i++)
+    {
+        process();
+    }
+    
     debughere();
     return 0;
 }
